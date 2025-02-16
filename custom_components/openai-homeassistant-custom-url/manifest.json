@@ -8,6 +8,6 @@
   "documentation": "https://www.home-assistant.io/integrations/openai_conversation",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "requirements": ["openai==11.63.0"],
+  "requirements": ["openai==1.63.0"],
   "version": "1.0.3"
 }
