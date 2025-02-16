@@ -26,6 +26,9 @@ from homeassistant.helpers.selector import (
     SelectSelectorConfig,
     SelectSelectorMode,
     TemplateSelector,
+    TextSelectorConfig,
+    TextSelectorType,
+    TextSelector
 )
 from homeassistant.helpers.typing import VolDictType
 
@@ -50,7 +53,9 @@ _LOGGER = logging.getLogger(__name__)
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_URL): str,
+        vol.Required(CONF_URL): TextSelector(
+            TextSelectorConfig(type=TextSelectorType.URL)
+        ),
         vol.Required(CONF_API_KEY): str,
     }
 )
