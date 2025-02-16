@@ -6,7 +6,7 @@ import openai
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_API_KEY, Platform
+from homeassistant.const import CONF_URL, CONF_API_KEY, Platform
 from homeassistant.core import (
     HomeAssistant,
     ServiceCall,
@@ -90,6 +90,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 async def async_setup_entry(hass: HomeAssistant, entry: OpenAIConfigEntry) -> bool:
     """Set up OpenAI Conversation from a config entry."""
     client = openai.AsyncOpenAI(
+        base_url=entry.data[CONF_URL],
         api_key=entry.data[CONF_API_KEY],
         http_client=get_async_client(hass),
     )
