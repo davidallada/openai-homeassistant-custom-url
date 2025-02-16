@@ -1,7 +1,4 @@
 {
   "services": {
-    "generate_image": {
-      "service": "mdi:image-sync"
-    }
   }
 }
