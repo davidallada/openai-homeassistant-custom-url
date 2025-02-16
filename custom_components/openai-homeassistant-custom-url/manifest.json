@@ -1,0 +1,12 @@
+{
+  "domain": "openai_homeassistant_custom_url",
+  "name": "OpenAI Conversation Custom URL",
+  "after_dependencies": ["assist_pipeline", "intent"],
+  "codeowners": ["@davidallada"],
+  "config_flow": true,
+  "dependencies": ["conversation"],
+  "documentation": "https://www.home-assistant.io/integrations/openai_conversation",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": ["openai==1.61.0"]
+}
