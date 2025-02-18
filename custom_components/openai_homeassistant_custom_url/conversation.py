@@ -24,7 +24,12 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_LLM_HASS_API, MATCH_ALL
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import chat_session, device_registry as dr, intent, llm
+from homeassistant.helpers.chat_session import async_get_chat_session
+from homeassistant.helpers.device_registry import DeviceInfo, DeviceEntryType
+from homeassistant.helpers.intent import IntentResponse
+from homeassistant.helpers.llm import Tool, ToolInput
+
+# from homeassistant.helpers import chat_session, device_registry as dr, intent, llm
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from . import OpenAIConfigEntry
@@ -59,7 +64,7 @@ async def async_setup_entry(
 
 
 def _format_tool(
-    tool: llm.Tool, custom_serializer: Callable[[Any], Any] | None
+    tool: Tool, custom_serializer: Callable[[Any], Any] | None
 ) -> ChatCompletionToolParam:
     """Format tool specification."""
     tool_spec = FunctionDefinition(
@@ -124,7 +129,7 @@ async def _transform_stream(
             if current_tool_call:
                 yield {
                     "tool_calls": [
-                        llm.ToolInput(
+                        ToolInput(
                             id=current_tool_call["id"],
                             tool_name=current_tool_call["tool_name"],
                             tool_args=json.loads(current_tool_call["tool_args"]),
@@ -162,7 +167,7 @@ async def _transform_stream(
         if current_tool_call:
             yield {
                 "tool_calls": [
-                    llm.ToolInput(
+                    ToolInput(
                         id=current_tool_call["id"],
                         tool_name=current_tool_call["tool_name"],
                         tool_args=json.loads(current_tool_call["tool_args"]),
@@ -190,12 +195,12 @@ class OpenAIConversationEntity(
         """Initialize the agent."""
         self.entry = entry
         self._attr_unique_id = entry.entry_id
-        self._attr_device_info = dr.DeviceInfo(
+        self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name=entry.title,
             manufacturer="OpenAI",
             model="ChatGPT",
-            entry_type=dr.DeviceEntryType.SERVICE,
+            entry_type=DeviceEntryType.SERVICE,
         )
         if self.entry.options.get(CONF_LLM_HASS_API):
             self._attr_supported_features = (
@@ -228,7 +233,7 @@ class OpenAIConversationEntity(
     ) -> conversation.ConversationResult:
         """Process a sentence."""
         with (
-            chat_session.async_get_chat_session(
+            async_get_chat_session(
                 self.hass, user_input.conversation_id
             ) as session,
             conversation.async_get_chat_log(self.hass, session, user_input) as chat_log,
@@ -303,7 +308,7 @@ class OpenAIConversationEntity(
             if not chat_log.unresponded_tool_results:
                 break
 
-        intent_response = intent.IntentResponse(language=user_input.language)
+        intent_response = IntentResponse(language=user_input.language)
         assert type(chat_log.content[-1]) is conversation.AssistantContent
         intent_response.async_set_speech(chat_log.content[-1].content or "")
         return conversation.ConversationResult(
